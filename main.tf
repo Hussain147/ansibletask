@@ -42,14 +42,14 @@ module "ansible_inv" {
       {
         name = aws_instance.frontend.public_dns
         ip   = aws_instance.frontend.public_ip
-       
+        vars = aws_instance.frontend.tags
       }
     ],
     "backend" = [
       {
-        name = aws_instance.backend.public_dnsco
+        name = aws_instance.backend.private_dns
         ip   = aws_instance.backend.public_ip
-        
+        vars = aws_instance.backend.tags
       }
     ]
   }
