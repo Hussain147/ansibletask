@@ -2,7 +2,49 @@
 - hosts: backend
   become: true
   tasks:
-    - name: Install Netdata
+---
+- name: Install Netdata on Ubuntu
+  hosts: your_ubuntu_server
+  become: true
+
+  tasks:
+    - name: Update apt cache
       apt:
-        name: netdata
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - zlib1g-dev
+          - uuid-dev
+          - libmnl-dev
+          - gcc
+          - make
+          - git
+          - autoconf
+          - autoconf-archive
+          - autogen
+          - automake
+          - pkg-config
+          - curl
+          - python
+          - python-yaml
         state: present
+
+    - name: Clone Netdata repository
+      git:
+        repo: https://github.com/netdata/netdata.git
+        dest: /opt/netdata
+        version: master
+
+    - name: Build and install Netdata
+      command: /opt/netdata/netdata-installer.sh --install /opt/netdata
+      args:
+        creates: /opt/netdata/usr/sbin/netdata
+
+    - name: Start Netdata service
+      systemd:
+        name: netdata
+        state: started
+        enabled: yes
+

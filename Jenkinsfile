@@ -12,43 +12,32 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/Hussain147/ansibletask.git/']]]) 
+                deleteDir()
+                sh 'echo cloning repo'
+                sh 'git clone https://github.com/Hussain147/ansibletask.git' 
             }
         }
         
         stage('Terraform Apply') {
             steps {
                 script {
+                    dir('/var/lib/jenkins/workspace/smaple/ansibletask') {
+                    sh 'pwd'
                     sh 'terraform init'
                     sh 'terraform validate'
+                    // sh 'terraform destroy -auto-approve'
+                    sh 'terraform plan'
                     sh 'terraform apply -auto-approve'
+                    }
                 }
             }
         }
-
-        // stage('Generate Ansible Inventory') {
-        //     steps {
-        //         script {
-        //             sh 'chmod +x generate_inventory.sh'
-        //             sh './generate_inventory.sh > inventory.ini'
-        //         }
-        //     }
-        // }
-
+        
         stage('Ansible Deployment') {
             steps {
                 script {
-                    ansiblePlaybook(
-                        playbook: 'amazon-playbook.yml',
-                        inventory: 'inventory.yaml',
-                        extras: "-e 'ansible_ssh_user=ec2-user -e ansible_ssh_private_key_file=~/.ssh/${AMAZON_KEY_PAIR}.pem'"
-                    )
-
-                    ansiblePlaybook(
-                        playbook: 'ubuntu-playbook.yml',
-                        inventory: 'inventory.yaml',
-                        extras: "-e 'ansible_ssh_user=ubuntu -e ansible_ssh_private_key_file=~/.ssh/${UBUNTU_KEY_PAIR}.pem'"
-                    )
+                    ansiblePlaybook becomeUser: 'ec2-user', credentialsId: 'amazonlinux', disableHostKeyChecking: true, installation: 'ansible', inventory: '/var/lib/jenkins/workspace/smaple/ansibletask/inventory.yaml', playbook: '/var/lib/jenkins/workspace/smaple/ansibletask/amazon-playbook.yml', vaultTmpPath: ''
+                    //   ansiblePlaybook become: true, credentialsId: 'ubuntu', disableHostKeyChecking: true, installation: 'ansible', inventory: '/var/lib/jenkins/workspace/smaple/ansibletask/inventory.yaml', playbook: '/var/lib/jenkins/workspace/smaple/ansibletask/ubuntu-playbook.yml', vaultTmpPath: ''
                 }
             }
         }
