@@ -2,49 +2,27 @@
 - hosts: backend
   become: true
   tasks:
----
-- name: Install Netdata on Ubuntu
-  hosts: your_ubuntu_server
-  become: true
-
-  tasks:
-    - name: Update apt cache
+    - name: Update apt cache (for Debian/Ubuntu systems)
       apt:
         update_cache: yes
+      when: ansible_os_family == 'Debian'
 
-    - name: Install required packages
-      apt:
-        name:
-          - zlib1g-dev
-          - uuid-dev
-          - libmnl-dev
-          - gcc
-          - make
-          - git
-          - autoconf
-          - autoconf-archive
-          - autogen
-          - automake
-          - pkg-config
-          - curl
-          - python
-          - python-yaml
+    - name: Install Netdata
+      package:
+        name: netdata
         state: present
-
-    - name: Clone Netdata repository
-      git:
-        repo: https://github.com/netdata/netdata.git
-        dest: /opt/netdata
-        version: master
-
-    - name: Build and install Netdata
-      command: /opt/netdata/netdata-installer.sh --install /opt/netdata
-      args:
-        creates: /opt/netdata/usr/sbin/netdata
+      become: true
 
     - name: Start Netdata service
-      systemd:
+      service:
         name: netdata
         state: started
         enabled: yes
 
+    - name: Open port 19999 in firewall
+      ufw:
+        rule: allow
+        port: 19999
+        proto: tcp
+      become: true
+      when: ansible_service_mgr == 'systemd'  # Adjust based on the init system used by your target servers
