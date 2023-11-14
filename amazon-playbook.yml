@@ -6,11 +6,22 @@
       selinux:
         state: disabled
 
-    - name: Install and configure Nginx
-      yum:
+    - name: Update DNF repositories
+      dnf:
+        name: "*"
+        state: latest
+
+    - name: Install Nginx
+      dnf:
         name: nginx
         state: present
 
+    - name: Start Nginx service
+      service:
+        name: nginx
+        state: started
+        enabled: true  # Start Nginx service on system boot
+        
     - name: Configure Nginx proxy
       template:
         src: nginx.conf.j2

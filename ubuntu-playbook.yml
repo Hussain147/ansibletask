@@ -1,0 +1,8 @@
+---
+- hosts: backend
+  become: true
+  tasks:
+    - name: Install Netdata
+      apt:
+        name: netdata
+        state: present
