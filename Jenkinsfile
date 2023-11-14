@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        AWS_REGION = 'us-east-1'
-        AMAZON_KEY_PAIR = 'linux'
-        UBUNTU_KEY_PAIR = 'ubuntu-key'
-    }
-
     stages {
         
 
@@ -37,7 +31,7 @@ pipeline {
             steps {
                 script {
                     ansiblePlaybook becomeUser: 'ec2-user', credentialsId: 'amazonlinux', disableHostKeyChecking: true, installation: 'ansible', inventory: '/var/lib/jenkins/workspace/smaple/ansibletask/inventory.yaml', playbook: '/var/lib/jenkins/workspace/smaple/ansibletask/amazon-playbook.yml', vaultTmpPath: ''
-                    //   ansiblePlaybook become: true, credentialsId: 'ubuntu', disableHostKeyChecking: true, installation: 'ansible', inventory: '/var/lib/jenkins/workspace/smaple/ansibletask/inventory.yaml', playbook: '/var/lib/jenkins/workspace/smaple/ansibletask/ubuntu-playbook.yml', vaultTmpPath: ''
+                    ansiblePlaybook become: true, credentialsId: 'ubuntuuser', disableHostKeyChecking: true, installation: 'ansible', inventory: '/var/lib/jenkins/workspace/smaple/ansibletask/inventory.yaml', playbook: '/var/lib/jenkins/workspace/smaple/ansibletask/ubuntu-playbook.yml', vaultTmpPath: ''
                 }
             }
         }
