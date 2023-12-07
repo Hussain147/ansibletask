@@ -44,6 +44,14 @@ EOF
 depends_on = [aws_instance.backend]
 }
 
+output "frontend_public_ip" {
+  value = aws_instance.frontend.public_ip
+}
+
+output "backend_public_ip" {
+  value = aws_instance.backend.public_ip
+}
+
 resource "local_file" "inventory" {
   filename = "./inventory.yaml"
   content  = <<EOF
@@ -52,12 +60,4 @@ ${aws_instance.frontend.public_ip}
 [backend]
 ${aws_instance.backend.public_ip}
 EOF
-}
-
-output "frontend_public_ip" {
-  value = aws_instance.frontend.public_ip
-}
-
-output "backend_public_ip" {
-  value = aws_instance.backend.public_ip
 }
