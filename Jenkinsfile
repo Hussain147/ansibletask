@@ -26,6 +26,14 @@ pipeline {
                 }
             }
         }
+
+        stage('Sleep for 5 minutes') {
+            steps {
+                script {
+                    sleep time: 300, unit: 'SECONDS'
+                }
+            }
+        }
         
         stage('Ansible Deployment') {
             steps {
